@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8 Years of Brotherhood — Jayant &amp; Leroy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<!--
+  ============================================================
+  HOW TO ADD YOUR PHOTOS
+  ------------------------------------------------------------
+  Scroll down to the <script> block near the bottom and find
+  the "memories" array. Each entry has a `src` field — that
+  is where you paste your image URL. There are exactly 8
+  entries (one per chapter). Each photo is used both in the
+  timeline chapter and in the Memory Wall grid, so you only
+  need to edit it once.
+  ============================================================
+-->
+
+<style>
+  :root{
+    --black: #07070a;
+    --navy: #0c1a2e;
+    --navy-light: #14263f;
+    --gold: #d4af37;
+    --gold-soft: #e8cf7a;
+    --white: #f4f2ea;
+    --orange: #e8833a;
+    --serif: 'Fraunces', serif;
+    --sans: 'Inter', sans-serif;
+    --hand: 'Caveat', cursive;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--black);
+    color: var(--white);
+    font-family: var(--sans);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  ::selection{ background: var(--gold); color: var(--black); }
+
+  /* subtle custom scrollbar */
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-track{ background:var(--black); }
+  ::-webkit-scrollbar-thumb{ background:linear-gradient(var(--gold), var(--orange)); border-radius:4px; }
+
+  a{ color:inherit; }
+
+  /* ---------- background canvas (stars + particles), fixed for whole page ---------- */
+  #bg-canvas{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .content{ position:relative; z-index:2; }
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{
+    opacity:0;
+    transform: translateY(40px);
+    transition: opacity 1s cubic-bezier(.19,1,.22,1), transform 1s cubic-bezier(.19,1,.22,1);
+  }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+  .reveal-left{ transform: translateX(-60px); }
+  .reveal-left.visible{ transform: translateX(0); }
+  .reveal-right{ transform: translateX(60px); }
+  .reveal-right.visible{ transform: translateX(0); }
+
+  @media (prefers-reduced-motion: reduce){
+    .reveal, .reveal-left, .reveal-right{ transition:none; opacity:1; transform:none; }
+    *{ animation-duration: 0.001ms !important; }
+  }
+
+  /* ================= HERO ================= */
+  .hero{
+    position: relative;
+    min-height: 100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 2rem;
+    overflow:hidden;
+  }
+
+  .hero-eyebrow{
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    color: var(--gold-soft);
+    letter-spacing: 0.06em;
+    opacity:0;
+    animation: fadeUp 1.4s 0.3s ease forwards;
+  }
+
+  .hero-title{
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 8vw, 6.2rem);
+    line-height: 1.05;
+    margin: 1.2rem 0 1.4rem;
+    background: linear-gradient(120deg, var(--white) 30%, var(--gold-soft) 55%, var(--orange) 75%, var(--white) 100%);
+    background-size: 220% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: fadeUp 1.4s 0.6s ease forwards, shimmer 8s linear infinite;
+    opacity: 0;
+  }
+
+  .hero-sub{
+    font-size: clamp(1rem, 2vw, 1.35rem);
+    color: #cfcfc7;
+    max-width: 560px;
+    font-weight: 300;
+    opacity:0;
+    animation: fadeUp 1.4s 0.9s ease forwards;
+  }
+  .hero-sub b{ color: var(--white); font-weight:500; }
+
+  .hero-cta{
+    margin-top: 3rem;
+    opacity:0;
+    animation: fadeUp 1.4s 1.3s ease forwards;
+  }
+
+  .btn-gold{
+    font-family: var(--sans);
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    font-size: 1rem;
+    padding: 1rem 2.4rem;
+    border-radius: 100px;
+    border: 1px solid rgba(212,175,55,0.5);
+    background: rgba(212,175,55,0.08);
+    color: var(--gold-soft);
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all .4s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .btn-gold::before{
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(90deg, var(--gold), var(--orange));
+    opacity:0;
+    transition: opacity .4s ease;
+    z-index:-1;
+  }
+  .btn-gold:hover{
+    color: var(--black);
+    border-color: transparent;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px -8px rgba(212,175,55,0.5);
+  }
+  .btn-gold:hover::before{ opacity:1; }
+
+  .scroll-cue{
+    position:absolute;
+    bottom: 2.2rem;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center;
+    gap:.5rem;
+    color: rgba(244,242,234,0.4);
+    font-size:.75rem;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    opacity:0;
+    animation: fadeUp 1.4s 1.6s ease forwards;
+  }
+  .scroll-cue .line{ width:1px; height:34px; background:linear-gradient(var(--gold), transparent); animation: pulseLine 2s ease-in-out infinite; }
+
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(24px);} to{ opacity:1; transform:translateY(0);} }
+  @keyframes shimmer{ to{ background-position: 220% center; } }
+  @keyframes pulseLine{ 0%,100%{ opacity:.3; } 50%{ opacity:1; } }
+
+  /* ================= SECTION SHELL ================= */
+  section{ position:relative; padding: 7rem 1.5rem; max-width: 1200px; margin:0 auto; }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto 4.5rem; }
+  .section-kicker{
+    font-family: var(--sans);
+    font-size:.8rem;
+    letter-spacing:.3em;
+    text-transform:uppercase;
+    color: var(--orange);
+    font-weight:600;
+  }
+  .section-title{
+    font-family: var(--serif);
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight:600;
+    margin-top:.7rem;
+    color: var(--white);
+  }
+  .section-title em{ color: var(--gold-soft); font-style:italic; }
+
+  /* ================= TIMELINE (the "road") ================= */
+  .journey{ position:relative; padding-top:2rem; }
+
+  .road-wrap{
+    position:absolute;
+    left:50%;
+    top:0;
+    bottom:0;
+    width: 4px;
+    transform: translateX(-50%);
+    z-index:1;
+  }
+  .road-line{
+    position:absolute;
+    inset:0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(212,175,55,0.55) 0px, rgba(212,175,55,0.55) 14px,
+      transparent 14px, transparent 28px
+    );
+    border-radius: 4px;
+  }
+  .road-progress{
+    position:absolute;
+    top:0; left:0; width:100%;
+    height:0%;
+    background: linear-gradient(var(--gold), var(--orange));
+    border-radius:4px;
+    box-shadow: 0 0 18px 2px rgba(232,131,58,0.6);
+    transition: height .1s linear;
+  }
+  .road-rider{
+    position:absolute;
+    left:50%;
+    top:0;
+    transform: translate(-50%, -50%);
+    width: 46px; height:46px;
+    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(circle, rgba(232,131,58,0.35), transparent 70%);
+    z-index:2;
+    transition: top .1s linear;
+  }
+  .road-rider i{
+    font-size:1.4rem;
+    color: var(--gold-soft);
+    filter: drop-shadow(0 0 8px rgba(212,175,55,0.7));
+  }
+
+  .chapter{
+    position:relative;
+    width:100%;
+    display:flex;
+    margin-bottom: 5.5rem;
+    z-index:2;
+  }
+  .chapter:last-child{ margin-bottom:0; }
+  .chapter-card{
+    width: 44%;
+    background: rgba(20,38,63,0.35);
+    border: 1px solid rgba(212,175,55,0.18);
+    backdrop-filter: blur(16px);
+    border-radius: 20px;
+    padding: 2rem 2.2rem;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.6);
+    transition: transform .5s ease, border-color .5s ease;
+  }
+  .chapter-card:hover{
+    transform: translateY(-6px);
+    border-color: rgba(212,175,55,0.5);
+  }
+  .chapter.left{ justify-content:flex-start; }
+  .chapter.right{ justify-content:flex-end; }
+
+  .chapter-num{
+    font-family: var(--serif);
+    font-size: 3.4rem;
+    font-weight:300;
+    color: rgba(232,131,58,0.55);
+    line-height:1;
+    margin-bottom: .3rem;
+  }
+  .chapter-title{
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+    font-weight:600;
+    margin-bottom: .9rem;
+    color: var(--white);
+  }
+  .chapter-text{
+    font-size: .98rem;
+    color: #d8d6ce;
+    font-weight:300;
+    white-space: pre-line;
+  }
+  .chapter-img{
+    margin-top: 1.4rem;
+    border-radius: 14px;
+    overflow:hidden;
+    aspect-ratio: 16/10;
+    background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(232,131,58,0.05));
+    border: 1px dashed rgba(212,175,55,0.35);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .chapter-img img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .img-placeholder-text{
+    font-size:.85rem;
+    color: rgba(244,242,234,0.45);
+    text-align:center;
+    padding: 1rem;
+    letter-spacing:.03em;
+  }
+  .img-placeholder-text i{ display:block; font-size:1.4rem; margin-bottom:.5rem; color: rgba(212,175,55,0.5); }
+
+  .dot{
+    position:absolute;
+    top: 2.6rem;
+    width: 16px; height:16px;
+    border-radius:50%;
+    background: var(--black);
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 14px 2px rgba(212,175,55,0.5);
+    z-index:3;
+  }
+  .chapter.left .dot{ right: calc(56% - 8px); }
+  .chapter.right .dot{ left: calc(56% - 8px); }
+
+  @media (max-width: 860px){
+    .road-wrap{ left: 22px; }
+    .chapter, .chapter.left, .chapter.right{ justify-content:flex-start; padding-left: 54px; }
+    .chapter-card{ width:100%; }
+    .dot{ left: 14px !important; right:auto !important; }
+    .chapter.left .dot, .chapter.right .dot{ left:14px; }
+    .road-rider{ left:22px; }
+  }
+
+  /* ================= COUNTERS ================= */
+  .counters-section{
+    background: linear-gradient(180deg, transparent, rgba(12,26,46,0.6), transparent);
+  }
+  .counters-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 2rem;
+    text-align:center;
+  }
+  .counter-card{
+    padding: 2rem 1rem;
+    border-radius: 18px;
+    background: rgba(20,38,63,0.3);
+    border: 1px solid rgba(212,175,55,0.15);
+  }
+  .counter-num{
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 3rem);
+    font-weight:700;
+    background: linear-gradient(120deg, var(--gold-soft), var(--orange));
+    -webkit-background-clip: text; background-clip:text; color:transparent;
+  }
+  .counter-label{
+    margin-top:.5rem;
+    font-size:.85rem;
+    letter-spacing:.05em;
+    color: #cfcdc4;
+  }
+
+  /* ================= MEMORY WALL ================= */
+  .wall-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.6rem;
+  }
+  .wall-card{
+    position:relative;
+    border-radius: 16px;
+    overflow:hidden;
+    aspect-ratio: 1/1;
+    cursor:pointer;
+    border: 1px solid rgba(212,175,55,0.2);
+    background: linear-gradient(135deg, rgba(212,175,55,0.06), rgba(232,131,58,0.04));
+  }
+  .wall-card img{ width:100%; height:100%; object-fit:cover; display:block; transition: transform .6s ease; }
+  .wall-card:hover img{ transform: scale(1.08); }
+  .wall-caption{
+    position:absolute; left:0; right:0; bottom:0;
+    padding: .9rem 1rem 1rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+    font-size: .85rem;
+    font-weight:500;
+    color: var(--white);
+    transform: translateY(6px);
+    opacity: .9;
+  }
+  .wall-empty-icon{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color: rgba(244,242,234,0.4);
+    font-size:.8rem; text-align:center; gap:.4rem; padding:1rem;
+  }
+  .wall-empty-icon i{ font-size:1.3rem; color: rgba(212,175,55,0.5); }
+
+  /* modal */
+  .modal-overlay{
+    position: fixed; inset:0;
+    background: rgba(4,6,10,0.92);
+    backdrop-filter: blur(6px);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 100;
+    opacity:0; pointer-events:none;
+    transition: opacity .4s ease;
+    padding: 2rem;
+  }
+  .modal-overlay.active{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    max-width: 780px; width:100%;
+    transform: scale(0.85);
+    transition: transform .45s cubic-bezier(.19,1,.22,1);
+    text-align:center;
+  }
+  .modal-overlay.active .modal-box{ transform: scale(1); }
+  .modal-box img{
+    width:100%; max-height:70vh; object-fit:contain;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,0.8);
+  }
+  .modal-caption{ margin-top:1.2rem; font-family: var(--serif); font-size:1.2rem; color: var(--gold-soft); }
+  .modal-close{
+    position:absolute; top:2rem; right:2rem;
+    width:44px; height:44px; border-radius:50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(212,175,55,0.3);
+    color: var(--white); font-size:1.1rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+
+  /* ================= LETTER ================= */
+  .letter-section{ display:flex; justify-content:center; }
+  .paper{
+    max-width: 680px;
+    width:100%;
+    background: linear-gradient(180deg, #f6f1e2, #efe7d1);
+    color: #2b2417;
+    border-radius: 6px;
+    padding: clamp(2rem, 5vw, 4rem);
+    box-shadow: 0 40px 100px -30px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.05);
+    position:relative;
+    font-family: var(--hand);
+    font-size: clamp(1.15rem, 2.4vw, 1.5rem);
+    line-height:1.9;
+    transform: rotate(-0.4deg);
+  }
+  .paper::before{
+    content:'';
+    position:absolute; inset:14px;
+    border: 1px solid rgba(43,36,23,0.15);
+    pointer-events:none;
+  }
+  #letter-typed{ white-space: pre-line; }
+  .letter-cursor{ display:inline-block; width:2px; background:#2b2417; margin-left:2px; animation: blink 1s step-end infinite; }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  /* ================= ENDING ================= */
+  .ending{
+    min-height: 100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+    padding: 4rem 1.5rem;
+  }
+  .ending-quote{
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight:500;
+    font-size: clamp(1.3rem, 3.4vw, 2.1rem);
+    max-width: 780px;
+    color: var(--white);
+    text-shadow: 0 0 30px rgba(212,175,55,0.35);
+  }
+  .ending-title{
+    font-family: var(--serif);
+    font-weight:700;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    margin-top: 2.6rem;
+    background: linear-gradient(120deg, var(--gold-soft), var(--orange));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .ending-names{
+    margin-top: 1rem;
+    font-size: 1.2rem;
+    letter-spacing:.05em;
+    color:#cfcdc4;
+  }
+  .ending-names i{ color: var(--orange); margin: 0 .3rem; }
+
+  .heart{
+    position:absolute;
+    bottom:-40px;
+    color: var(--orange);
+    opacity:.8;
+    pointer-events:none;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp{
+    to{ transform: translateY(-115vh) translateX(var(--drift, 20px)) rotate(20deg); opacity:0; }
+  }
+
+  /* ================= MUSIC TOGGLE ================= */
+  .music-toggle{
+    position: fixed;
+    bottom: 1.6rem;
+    right: 1.6rem;
+    width: 54px; height:54px;
+    border-radius:50%;
+    background: rgba(20,38,63,0.6);
+    border: 1px solid rgba(212,175,55,0.4);
+    backdrop-filter: blur(10px);
+    color: var(--gold-soft);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 1.1rem;
+    cursor:pointer;
+    z-index: 50;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .music-toggle:hover{ transform: scale(1.08); box-shadow: 0 0 20px rgba(212,175,55,0.4); }
+  .music-toggle.playing i{ animation: spin 3s linear infinite; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  footer{
+    text-align:center;
+    padding: 2.5rem 1.5rem 3rem;
+    font-size:.8rem;
+    color: rgba(244,242,234,0.35);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<audio id="bg-audio" loop>
+  <!-- Optional: replace this src with your own soft background track -->
+  <source src="" type="audio/mpeg">
+</audio>
+<button class="music-toggle" id="musicToggle" aria-label="Toggle background music">
+  <i class="fa-solid fa-music"></i>
+</button>
+
+<div class="content">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-eyebrow">"Some friendships are chosen by destiny."</div>
+    <h1 class="hero-title">8 Years of Brotherhood</h1>
+    <p class="hero-sub">Some people enter your life.<br><b>Legends stay forever.</b></p>
+    <div class="hero-cta">
+      <button class="btn-gold" id="beginJourney">Begin Our Journey</button>
+    </div>
+    <div class="scroll-cue"><span>Scroll</span><div class="line"></div></div>
+  </section>
+
+  <!-- ============ TIMELINE ============ -->
+  <section class="journey" id="journey">
+    <div class="section-head reveal">
+      <div class="section-kicker">The Road So Far</div>
+      <h2 class="section-title">Eight Years, <em>One Ride</em></h2>
+    </div>
+
+    <div class="road-wrap" id="roadWrap">
+      <div class="road-line"></div>
+      <div class="road-progress" id="roadProgress"></div>
+      <div class="road-rider" id="roadRider"><i class="fa-solid fa-motorcycle"></i></div>
+    </div>
+
+    <div id="chaptersContainer"></div>
+  </section>
+
+  <!-- ============ COUNTERS ============ -->
+  <section class="counters-section">
+    <div class="section-head reveal">
+      <div class="section-kicker">By The Numbers</div>
+      <h2 class="section-title">Not Bad, For Two <em>Dreamers</em></h2>
+    </div>
+    <div class="counters-grid" id="countersGrid">
+      <div class="counter-card reveal"><div class="counter-num" data-target="8">0</div><div class="counter-label">Years Together</div></div>
+      <div class="counter-card reveal"><div class="counter-num" data-target="2">0</div><div class="counter-label">Books Published</div></div>
+      <div class="counter-card reveal"><div class="counter-num" data-target="2">0</div><div class="counter-label">Royal Enfields</div></div>
+      <div class="counter-card reveal"><div class="counter-num" data-target="2">0</div><div class="counter-label">Professors</div></div>
+      <div class="counter-card reveal"><div class="counter-num" data-target="2">0</div><div class="counter-label">Future Doctors</div></div>
+      <div class="counter-card reveal"><div class="counter-num" data-target="0" data-infinite="true">0</div><div class="counter-label">Infinite Memories</div></div>
+    </div>
+  </section>
+
+  <!-- ============ MEMORY WALL ============ -->
+  <section id="memoryWall">
+    <div class="section-head reveal">
+      <div class="section-kicker">Memory Wall</div>
+      <h2 class="section-title">Frames From <em>Our Story</em></h2>
+    </div>
+    <div class="wall-grid" id="wallGrid"></div>
+  </section>
+
+  <!-- ============ LETTER ============ -->
+  <section class="letter-section">
+    <div class="paper reveal" id="letterPaper">
+      <div id="letter-typed"></div><span class="letter-cursor" id="letterCursor">&nbsp;</span>
+    </div>
+  </section>
+
+  <!-- ============ ENDING ============ -->
+  <section class="ending" id="endingScene">
+    <div class="ending-quote reveal" id="endingQuote">"Some friendships aren't measured in years&hellip;<br>They're measured in moments that become a lifetime."</div>
+    <div class="ending-title reveal">Happy 8 Years of Brotherhood</div>
+    <div class="ending-names reveal">Jayant <i class="fa-solid fa-heart"></i> Leroy</div>
+  </section>
+
+  <footer>Made with eight years of memories &amp; one very good friendship.</footer>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <button class="modal-close" id="modalClose"><i class="fa-solid fa-xmark"></i></button>
+  <div class="modal-box">
+    <img id="modalImg" src="" alt="">
+    <div class="modal-caption" id="modalCaption"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   MEMORIES DATA — paste your image URLs here (exactly 8).
+   Each memory is used both in the timeline chapter and again
+   in the Memory Wall grid below, so you only edit it once.
+   ============================================================ */
+const memories = [
+  { title: "It Started With M&M's 🍫", caption: "IHM Silvassa · Where it all began",
+    text: "Who knew that a simple packet of M&M's in IHM Silvassa would become the beginning of an unforgettable story?\n\nThat tiny moment introduced me to someone who would become family.",
+    src: "" },
+  { title: "From Classmates to Roommates 🏠", caption: "Second year · Same room, endless laughs",
+    text: "Second year.\nTraining.\nSame room.\nEndless conversations.\nCountless laughs.\nMemories that still feel like yesterday.",
+    src: "" },
+  { title: "Brothers Beyond College 🎓", caption: "AIHM Chandigarh · New city, same dream",
+    text: "Our journey didn't stop after graduation.\nWe chose to continue together.\nMaster's at AIHM Chandigarh.\nNew city.\nSame dream.\nSame madness.",
+    src: "" },
+  { title: "The Toughest Days", caption: "The struggle that built us",
+    text: "You witnessed every version of me.\nYou saw me struggling.\nYou saw me working as a Swiggy delivery boy.\nYou saw the failures.\nThe sleepless nights.\nThe doubts.\n\nYet...\nYou never left.",
+    src: "" },
+  { title: "We Grew Together", caption: "From students to Professors",
+    text: "Years later...\nWe became Professors.\nStanding in front of classrooms.\nTeaching students.\nLiving the dream we once only talked about.",
+    src: "" },
+  { title: "Same Passion • Same Ride 🏍️", caption: "Two Royal Enfield Classic 350s",
+    text: "Some people buy matching friendship bands.\nWe bought Royal Enfield Classic 350s.\nBecause brothers ride together.",
+    src: "" },
+  { title: "Dreams Becoming Reality 📚", caption: "Two books, two PhDs in progress",
+    text: "Together...\nPublished two books.\nPursuing our PhDs.\nChasing knowledge.\nChasing impact.\n\nSoon...\nDr. Leroy.\nDr. Jayant.",
+    src: "" },
+  { title: "Forever Grateful ❤️", caption: "Brothers, not by blood — by choice",
+    text: "Thank you for standing beside me during every high...\nevery low...\nevery impossible moment.\n\nThank you for believing in me when I couldn't believe in myself.\n\nYou're more than my best friend.\nYou're my brother.\n\nAnd no matter where life takes us...\nthis story is far from over.",
+    src: "" }
+];
+
+/* ---------------- background canvas: stars + drifting particles ---------------- */
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, stars = [], particles = [];
+
+function resizeCanvas(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = document.documentElement.scrollHeight;
+  initField();
+}
+function initField(){
+  const starCount = Math.floor((W * Math.min(H, window.innerHeight * 3)) / 9000);
+  stars = Array.from({length: Math.min(starCount, 260)}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 1.3 + 0.2,
+    tw: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.015 + 0.005
+  }));
+  particles = Array.from({length: 34}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    r: Math.random() * 2 + 0.6,
+    vy: -(Math.random() * 0.25 + 0.08),
+    vx: (Math.random() - 0.5) * 0.15,
+    hueGold: Math.random() > 0.5
+  }));
+}
+let scrollYCache = 0;
+function draw(){
+  ctx.clearRect(0, 0, W, H);
+  const viewTop = scrollYCache, viewBottom = scrollYCache + window.innerHeight + 200;
+
+  ctx.save();
+  for(const s of stars){
+    if(s.y < viewTop - 50 || s.y > viewBottom) continue;
+    s.tw += s.speed;
+    const alpha = 0.35 + Math.sin(s.tw) * 0.35;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(244,242,234,${Math.max(0, alpha)})`;
+    ctx.fill();
+  }
+  for(const p of particles){
+    p.y += p.vy; p.x += p.vx;
+    if(p.y < viewTop - 20){ p.y = viewBottom + 20; p.x = Math.random() * W; }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.hueGold ? 'rgba(212,175,55,0.45)' : 'rgba(232,131,58,0.35)';
+    ctx.fill();
+  }
+  ctx.restore();
+  requestAnimationFrame(draw);
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+requestAnimationFrame(draw);
+
+/* ---------------- build timeline chapters ---------------- */
+const chaptersContainer = document.getElementById('chaptersContainer');
+memories.forEach((m, i) => {
+  const side = i % 2 === 0 ? 'left' : 'right';
+  const el = document.createElement('div');
+  el.className = `chapter ${side}`;
+  el.innerHTML = `
+    <div class="dot"></div>
+    <div class="chapter-card reveal ${side === 'left' ? 'reveal-left' : 'reveal-right'}">
+      <div class="chapter-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="chapter-title">${m.title}</div>
+      <div class="chapter-text">${m.text}</div>
+      <div class="chapter-img" data-memory="${i}">
+        ${m.src ? `<img src="${m.src}" alt="${m.title}" loading="lazy">` :
+          `<div class="img-placeholder-text"><i class="fa-regular fa-image"></i>Paste your image URL here</div>`}
+      </div>
+    </div>
+  `;
+  chaptersContainer.appendChild(el);
+});
+
+/* ---------------- build memory wall (reuses the same 8 photos) ---------------- */
+const wallGrid = document.getElementById('wallGrid');
+memories.forEach((m, i) => {
+  const card = document.createElement('div');
+  card.className = 'wall-card reveal';
+  card.dataset.memory = i;
+  card.innerHTML = m.src
+    ? `<img src="${m.src}" alt="${m.title}" loading="lazy"><div class="wall-caption">${m.caption}</div>`
+    : `<div class="wall-empty-icon"><i class="fa-regular fa-image"></i>Paste your image URL here</div><div class="wall-caption">${m.caption}</div>`;
+  wallGrid.appendChild(card);
+});
+
+/* ---------------- modal ---------------- */
+const modalOverlay = document.getElementById('modalOverlay');
+const modalImg = document.getElementById('modalImg');
+const modalCaption = document.getElementById('modalCaption');
+document.getElementById('wallGrid').addEventListener('click', (e) => {
+  const card = e.target.closest('.wall-card');
+  if(!card) return;
+  const m = memories[card.dataset.memory];
+  modalImg.src = m.src || '';
+  modalImg.alt = m.title;
+  modalCaption.textContent = m.caption;
+  modalOverlay.classList.add('active');
+});
+function closeModal(){ modalOverlay.classList.remove('active'); }
+document.getElementById('modalClose').addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', (e) => { if(e.target === modalOverlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+/* ---------------- reveal on scroll ---------------- */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ---------------- animated counters ---------------- */
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    const el = entry.target;
+    if(el.dataset.infinite){
+      el.textContent = '∞';
+    } else {
+      const target = parseInt(el.dataset.target, 10);
+      let cur = 0;
+      const step = Math.max(1, Math.ceil(target / 40));
+      const tick = () => {
+        cur += step;
+        if(cur >= target){ el.textContent = target; return; }
+        el.textContent = cur;
+        requestAnimationFrame(tick);
+      };
+      tick();
+    }
+    counterObserver.unobserve(el);
+  });
+}, { threshold: 0.4 });
+document.querySelectorAll('.counter-num').forEach(el => counterObserver.observe(el));
+
+/* ---------------- rider travels down the road as you scroll ---------------- */
+const roadWrap = document.getElementById('roadWrap');
+const roadProgress = document.getElementById('roadProgress');
+const roadRider = document.getElementById('roadRider');
+
+function updateRoad(){
+  const rect = roadWrap.getBoundingClientRect();
+  const total = rect.height;
+  const viewportCenter = window.innerHeight * 0.55;
+  let progressPx = viewportCenter - rect.top;
+  progressPx = Math.max(0, Math.min(total, progressPx));
+  const pct = total > 0 ? (progressPx / total) * 100 : 0;
+  roadProgress.style.height = pct + '%';
+  roadRider.style.top = progressPx + 'px';
+}
+
+/* ---------------- typewriter letter ---------------- */
+const letterText = `Dear Leroy,
+
+Eight years ago, neither of us knew that a simple meeting would shape so much of our lives.
+
+We've been classmates.
+Roommates.
+Dreamers.
+Strugglers.
+Riders.
+Authors.
+Professors.
+And now, soon, Doctors.
+
+Thank you for never leaving my side.
+
+Thank you for believing in me.
+
+Thank you for celebrating every victory and carrying every burden alongside me.
+
+Blood makes you related.
+Loyalty makes you brothers.
+
+Love you always, bhai.
+
+Here's to the next 80 years.
+
+— Jayant ❤️`;
+
+const letterTarget = document.getElementById('letter-typed');
+const letterCursor = document.getElementById('letterCursor');
+let letterTyped = false;
+const letterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting && !letterTyped){
+      letterTyped = true;
+      let i = 0;
+      const speed = 18;
+      function typeChar(){
+        if(i <= letterText.length){
+          letterTarget.textContent = letterText.slice(0, i);
+          i++;
+          setTimeout(typeChar, speed);
+        } else {
+          letterCursor.style.display = 'none';
+        }
+      }
+      typeChar();
+      letterObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+letterObserver.observe(document.getElementById('letterPaper'));
+
+/* ---------------- ending: floating hearts + confetti burst ---------------- */
+const endingScene = document.getElementById('endingScene');
+let heartsStarted = false;
+function spawnHeart(){
+  const h = document.createElement('i');
+  h.className = 'fa-solid fa-heart heart';
+  h.style.left = Math.random() * 100 + '%';
+  h.style.setProperty('--drift', (Math.random() * 80 - 40) + 'px');
+  h.style.fontSize = (Math.random() * 14 + 10) + 'px';
+  h.style.animationDuration = (Math.random() * 4 + 6) + 's';
+  endingScene.appendChild(h);
+  setTimeout(() => h.remove(), 11000);
+}
+function confettiBurst(){
+  const colors = ['#d4af37', '#e8833a', '#f4f2ea'];
+  for(let i = 0; i < 60; i++){
+    const c = document.createElement('div');
+    const size = Math.random() * 7 + 4;
+    c.style.position = 'absolute';
+    c.style.width = size + 'px';
+    c.style.height = size + 'px';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.left = '50%';
+    c.style.top = '35%';
+    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    c.style.opacity = '0.9';
+    c.style.pointerEvents = 'none';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = Math.random() * 260 + 80;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist - 60;
+    c.animate([
+      { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) rotate(${Math.random()*360}deg)`, opacity: 0 }
+    ], { duration: 1600 + Math.random()*600, easing: 'cubic-bezier(.16,1,.3,1)' });
+    endingScene.appendChild(c);
+    setTimeout(() => c.remove(), 2300);
+  }
+}
+const endingObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting && !heartsStarted){
+      heartsStarted = true;
+      confettiBurst();
+      let count = 0;
+      const heartInterval = setInterval(() => {
+        spawnHeart();
+        count++;
+        if(count > 400) clearInterval(heartInterval);
+      }, 500);
+    }
+  });
+}, { threshold: 0.3 });
+endingObserver.observe(endingScene);
+
+/* ---------------- hero CTA scroll ---------------- */
+document.getElementById('beginJourney').addEventListener('click', () => {
+  document.getElementById('journey').scrollIntoView({ behavior: 'smooth' });
+});
+
+/* ---------------- music toggle (optional — add your own track src above) ---------------- */
+const audio = document.getElementById('bg-audio');
+const musicToggle = document.getElementById('musicToggle');
+let playing = false;
+musicToggle.addEventListener('click', () => {
+  if(!audio.src || audio.src === window.location.href){
+    musicToggle.title = 'Add a track src to the <audio> tag to enable music';
+    return;
+  }
+  if(playing){ audio.pause(); musicToggle.classList.remove('playing'); }
+  else { audio.play().catch(()=>{}); musicToggle.classList.add('playing'); }
+  playing = !playing;
+});
+
+/* ---------------- scroll loop ---------------- */
+function onScroll(){
+  scrollYCache = window.scrollY;
+  updateRoad();
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('load', () => { resizeCanvas(); updateRoad(); });
+setTimeout(() => { resizeCanvas(); updateRoad(); }, 300);
+</script>
+</body>
+</html>
